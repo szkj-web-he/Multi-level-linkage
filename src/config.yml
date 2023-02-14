@@ -1,0 +1,12 @@
+# The question text can be modified by the survey owner.
+question: "Q1. 请选择日期"
+# The instructions to the question can be modified by the survey owner. It's recommended that the existing instructions are included in the customised instructions.
+instruction: ""
+# 这个是日期选择器,code不要随便改动,content可以改
+options:
+    [
+        { "code": "year", "content": "年" },
+        { "code": "month", "content": "月" },
+        { "code": "day", "content": "日" },
+        { "code": "week", "content": "星期" },
+    ]
