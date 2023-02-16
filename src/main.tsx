@@ -11,6 +11,7 @@ import { deepCloneData } from "./Components/Unit/deepCloneData";
 import { comms, DataProps } from "./index";
 import OptionItem from "./option";
 import { initMenuData, initSelectData } from "./unit";
+import { useEffect } from "react";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
@@ -36,6 +37,11 @@ const Temp: React.FC<TempProps> = ({ list }) => {
 
     const selectDataRef = useRef<typeof selectData>(initSelectData());
     /* <------------------------------------ **** STATE END **** ------------------------------------ */
+
+    useEffect(() => {
+        comms.state = selectData;
+    }, [selectData]);
+
     /* <------------------------------------ **** PARAMETER START **** ------------------------------------ */
     /************* This section will include this component parameter *************/
 
