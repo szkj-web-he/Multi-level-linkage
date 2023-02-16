@@ -4,7 +4,11 @@
     "description": "",
     "main": ".eslintrc.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "build": "webpack --mode=production",
+        "clean": "rm -rf dist",
+        "dev-server": "webpack serve",
+        "run-offline": "node -r ts-node/register src/cli.ts",
+        "lint": "eslint src --ext .js,.jsx,.ts,.tsx"
     },
     "repository": {
         "type": "git",

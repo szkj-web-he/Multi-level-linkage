@@ -6,64 +6,104 @@
  */
 /* <------------------------------------ **** DEPENDENCE IMPORT START **** ------------------------------------ */
 /** This section will include all the necessary dependence for this tsx file */
-import React, { useEffect, useState } from "react";
-import { CalendarInput } from "./Components/Calendar/CalendarInput";
-import { DatePicker } from "./Components/Calendar/DatePicker";
-import { CalendarMobile } from "./Components/CalendarMobile";
-import { useMobile } from "./Components/Scroll/Unit/useMobile";
-import { comms } from "./index";
+import React, { useRef, useState } from "react";
+import { deepCloneData } from "./Components/Unit/deepCloneData";
+import { comms, DataProps } from "./index";
+import OptionItem from "./option";
+import { initMenuData, initSelectData } from "./unit";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
 
+interface TempProps {
+    list: Array<DataProps>;
+}
+
 /* <------------------------------------ **** INTERFACE END **** ------------------------------------ */
 /* <------------------------------------ **** FUNCTION COMPONENT START **** ------------------------------------ */
-const Temp: React.FC = () => {
+const Temp: React.FC<TempProps> = ({ list }) => {
     /* <------------------------------------ **** STATE START **** ------------------------------------ */
     /************* This section will include this component HOOK function *************/
 
-    const isMobile = useMobile();
+    /**
+     * 非一级的menu
+     */
+    const [menuData, setMenuData] = useState(() => initMenuData());
 
-    const [date, setDate] = useState<Date>();
+    const menuDataRef = useRef<typeof menuData>(initMenuData());
 
+    const [selectData, setSelectData] = useState(() => initSelectData());
+
+    const selectDataRef = useRef<typeof selectData>(initSelectData());
     /* <------------------------------------ **** STATE END **** ------------------------------------ */
     /* <------------------------------------ **** PARAMETER START **** ------------------------------------ */
     /************* This section will include this component parameter *************/
 
-    useEffect(() => {
-        comms.state = {
-            year: date?.getFullYear(),
-            month: date ? date.getMonth() + 1 : undefined,
-            day: date?.getDate(),
-            week: date?.getDay() === 0 ? 7 : date?.getDay(),
-        };
-    }, [date]);
+    const changeMenuData = (data: typeof menuData) => {
+        setMenuData(deepCloneData(data));
+        menuDataRef.current = deepCloneData(data);
+    };
 
-    /* <------------------------------------ **** PARAMETER END **** ------------------------------------ */
-    /* <------------------------------------ **** FUNCTION START **** ------------------------------------ */
-    /************* This section will include this component general function *************/
+    const changeSelectData = (data: typeof selectData) => {
+        setSelectData(deepCloneData(data));
+        selectDataRef.current = deepCloneData(data);
+    };
+
+    const onChange = (keyVal: string, changeData: DataProps) => {
+        const options = comms.config.options ?? [];
+
+        /**
+         * 是否需要重置
+         */
+        let isRest = false;
+
+        const _menuData = menuDataRef.current;
+        const _selectData = selectDataRef.current;
+
+        for (let i = 0; i < options.length; i++) {
+            const item = options[i];
+
+            if (item.code === keyVal) {
+                _menuData[options[i + 1]?.code] = changeData.children ?? [];
+                _selectData[item.code] = changeData.name;
+                isRest = true;
+            } else if (isRest) {
+                _menuData[options[i + 1]?.code] = [];
+                _selectData[item.code] = null;
+            }
+        }
+        changeMenuData(_menuData);
+        changeSelectData(_selectData);
+    };
+
     /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
 
-    if (isMobile) {
-        return (
-            <CalendarMobile
-                className="mobileDatePicker_iptWrapper"
-                value={date}
-                onChange={(date) => {
-                    setDate(date);
-                }}
-            />
-        );
-    }
+    const options = comms.config.options ?? [];
+
     return (
-        <DatePicker
-            handleTimeChange={(date) => {
-                setDate(date ?? undefined);
-            }}
-            value={date}
-        >
-            <CalendarInput placeholder={"请选择日期"} className={"datePicker_iptWrapper"} />
-        </DatePicker>
+        <>
+            {options.map((option, index) => {
+                let optionList: Array<DataProps> = [];
+
+                if (index === 0) {
+                    optionList = list;
+                } else {
+                    optionList = menuData[option.code] ?? [];
+                }
+                return (
+                    <OptionItem
+                        key={index}
+                        disable={index === 0 ? false : !menuData?.[option.code]?.length}
+                        name={option.content}
+                        onChange={(res) => {
+                            onChange(option.code, res);
+                        }}
+                        value={selectData[option.code] ?? undefined}
+                        list={optionList}
+                    />
+                );
+            })}
+        </>
     );
 };
 /* <------------------------------------ **** FUNCTION COMPONENT END **** ------------------------------------ */

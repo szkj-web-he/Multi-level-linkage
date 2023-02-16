@@ -37,15 +37,139 @@ body {
     @include c_h_5();
 }
 
-.datePicker_iptWrapper {
-    .calendarInput_content {
-        width: 600px;
-        height: 40px;
-        max-width: 100vw;
+.option_btn {
+    width: 600px;
+    height: 40px;
+    max-width: 100%;
+
+    position: relative;
+    outline: none;
+    transition: all 0.1s linear;
+    &:not(.option_btnActive):not(.option_btnDisable):hover {
+        .option_btnContent {
+            border-color: #67cdd6;
+        }
+    }
+    &.option_btnActive {
+        .option_btnContent {
+            border-color: #22a6b3;
+        }
+        .option_btnBorder {
+            opacity: 1;
+        }
+        .option_btnIcon {
+            transform: rotate(180deg);
+        }
+    }
+    margin-bottom: 23px;
+}
+
+.option_btnContent {
+    width: 100%;
+    height: 100%;
+    background-color: #fff;
+    padding: 10px 12px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-flow: row nowrap;
+    border: 1px solid #ebebeb;
+    border-radius: 6px;
+    position: relative;
+    z-index: 2;
+    cursor: pointer;
+}
+
+.option_btnBorder {
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    box-sizing: content-box;
+    background-color: rgba(#3cbbc7, 0.3);
+    width: calc(100% + 4px);
+    height: calc(100% + 4px);
+    border-radius: 6px;
+    z-index: 1;
+    opacity: 0;
+    transition: all 0.1s linear;
+}
+
+.option_placeholder {
+    @include c_body_3();
+    color: #bdbdbd;
+}
+
+.option_value {
+    @include c_body_3();
+    color: #4d4d4d;
+}
+
+.option_item {
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-flow: row nowrap;
+    padding-left: 8px;
+    box-sizing: border-box;
+    width: 100%;
+    margin-bottom: 8px;
+    cursor: pointer;
+    outline: none;
+    @include c_body_3();
+    color: #757575;
+    box-sizing: border-box;
+    transition: all 0.1s linear;
+    &.option_itemActive {
+        color: #22a6b3;
+    }
+    &:last-child {
+        margin-bottom: 0;
+    }
+    &:hover {
+        background: #e9f7f8;
+        border-radius: 4px;
     }
 }
 
-.mobileDatePicker_iptWrapper {
-    width: 100%;
-    height: 40px;
+.option_btnIconContainer {
+    display: inline-flex;
+    width: 16px;
+    height: 16px;
+    align-items: center;
+    justify-content: center;
+}
+
+.option_btnIcon {
+    font-size: 11px;
+    color: #4d4d4d;
+    flex: 0 0 auto;
+    transition: all 0.1s linear;
+}
+
+.option_dropdownScrollBody.scroll_scrollBody {
+    max-height: 351px;
+    height: auto;
+    max-width: 100vw;
+    width: 600px;
+    padding: 8px 4px 0px 4px;
+    box-sizing: border-box;
+}
+
+.option_dropdownBody {
+    border-radius: 6px;
+    background: #ffffff;
+    box-shadow: 0px 2px 6px rgba(26, 26, 26, 0.06), 0px 3px 15px rgba(26, 26, 26, 0.1);
+    padding-bottom: 8px;
+    box-sizing: border-box;
+}
+
+.option_btn.option_btnDisable {
+    .option_btnContent {
+        background: #fafafa;
+    }
+    .option_btnIcon {
+        color: #bdbdbd;
+    }
 }

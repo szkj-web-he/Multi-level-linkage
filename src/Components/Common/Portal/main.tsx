@@ -8,23 +8,22 @@
 /** This section will include all the necessary dependence for this tsx file */
 import React, { forwardRef, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { mountElement } from "./mount";
+import useUpdateLayoutEffect from "../../Hooks/useUpdateLayoutEffect";
+import { deepCloneData } from "../../Unit/deepCloneData";
 import { ActionType, useCssTransition } from "../Hooks/useCssTransition";
 import { AutoPositionResult, main } from "../Kite/Unit/autoPosition";
+import { getScrollValue } from "../Kite/Unit/getScrollValue";
 import { getTriangle } from "../Kite/Unit/getTriangle";
 import { listenDomChange } from "../Kite/Unit/listenDomChange";
 import { toFixed } from "../Kite/Unit/toFixed";
 import { getTransitionClass, TransitionClassProps } from "../Kite/Unit/transitionClass";
 import Triangle from "../Kite/Unit/triangle";
 import { MainProps, SizeProps } from "../Kite/Unit/type";
-import { setStyle } from "../Transition/Unit/addStyle";
 import useEventListener from "./../../Hooks/useEventListener";
 import { useLatest } from "./../../Hooks/useLatest";
 import { useCloneElementSize } from "./../Hooks/useCloneElementSize";
+import { mountElement } from "./mount";
 import "./style.scss";
-import { getScrollValue } from "../Kite/Unit/getScrollValue";
-import useUpdateLayoutEffect from "../../Hooks/useUpdateLayoutEffect";
-import { deepCloneData } from "../../Unit/deepCloneData";
 /* <------------------------------------ **** DEPENDENCE IMPORT END **** ------------------------------------ */
 /* <------------------------------------ **** INTERFACE START **** ------------------------------------ */
 /** This section will include all the interface for this tsx file */
@@ -72,7 +71,7 @@ const Temp = forwardRef<HTMLDivElement, TempProps>(
         const [positional, setPositional] = useState<AutoPositionResult>();
         const autoPositionFn = useLatest(main());
         const transitionEnd = useRef<boolean>();
-        const [initStyle, setInitStyle] = useState(style);
+        const [point, setPoint] = useState<React.CSSProperties>();
 
         /**
          * 用来diff比较
@@ -114,7 +113,10 @@ const Temp = forwardRef<HTMLDivElement, TempProps>(
         });
 
         const [dispatch, currentClassName, currentStyle] = useCssTransition(
-            initStyle,
+            {
+                ...style,
+                ...point,
+            },
             () => {
                 // console.log("**************** start ******************");
                 handleTransitionStart?.();
@@ -144,7 +146,6 @@ const Temp = forwardRef<HTMLDivElement, TempProps>(
          * 刷新计算位置的方法
          */
         const refreshFn = useRef((needSwitchVisible = false) => {
-            const portal = portalRef.current;
             const btn = rootRef.current;
             /**
              * 设置portal的位置
@@ -165,21 +166,10 @@ const Temp = forwardRef<HTMLDivElement, TempProps>(
                         }
                     }
 
-                    if (portal) {
-                        setStyle(
-                            portal,
-                            Object.assign({}, styleRef.current, {
-                                left: `${left}px`,
-                                top: `${top}px`,
-                            }),
-                        );
-                    }
-                    setInitStyle(
-                        Object.assign({}, styleRef.current, {
-                            left: `${left}px`,
-                            top: `${top}px`,
-                        }),
-                    );
+                    setPoint({
+                        left: `${left}px`,
+                        top: `${top}px`,
+                    });
                 }
             };
 
@@ -294,9 +284,6 @@ const Temp = forwardRef<HTMLDivElement, TempProps>(
          * 将监听的数据转化为静态变量
          */
 
-        useLayoutEffect(() => {
-            setInitStyle((pre) => ({ ...pre, ...style }));
-        }, [style]);
         useEffect(() => {
             return () => {
                 showRef.current = {
@@ -578,7 +565,7 @@ const Temp = forwardRef<HTMLDivElement, TempProps>(
                         (ref as React.MutableRefObject<HTMLElement | null>).current = el;
                     }
                 }}
-                style={{ ...style, ...currentStyle.current }}
+                style={{ ...style, ...point, ...currentStyle.current }}
                 {...props}
             >
                 <Triangle
