@@ -427,7 +427,7 @@ export const useCssTransition = (
         };
 
         //转为可见
-        const toVisible = (needInit: boolean) => {
+        const toVisible = () => {
             const toTransition = () => {
                 void readSize().then(() => {
                     /**
@@ -446,7 +446,7 @@ export const useCssTransition = (
                 /**
                  * enter的过渡className有过渡属性
                  */
-                if (needInit && !root.classList.contains("transition_hidden")) {
+                if (window.getComputedStyle(root, null).display !== "none") {
                     operationClassName("add", ["transition_hidden"]);
                     forceReflow();
                     void delayTimeFn().then(toTransition);
@@ -492,6 +492,7 @@ export const useCssTransition = (
 
             setStyle(root, styleRef.current);
             operationClassName("remove", insertedClassName.current);
+            operationClassName("add", show ? ["transition_hidden"] : []);
         };
 
         /**
@@ -592,22 +593,15 @@ export const useCssTransition = (
 
         /**
          * 过渡动画的主体函数
-         * @param needInit 需不需要判断 要变成可见之前有没有 hidden这个className
-         *
-         * 1. 在needInit为true的时候
-         * 2. 在需要过渡动画的时候
-         * 3. 判断show===true
-         * 4. 没有transition_hidden的时候
-         * 添加transition_hidden这个属性
          *
          */
-        const mainFn = (needInit = false) => {
+        const mainFn = () => {
             if (isTransition.current) {
                 /**
                  * 如果需要执行过渡动画
                  */
                 if (show) {
-                    toVisible(needInit);
+                    toVisible();
                 } else {
                     toHidden();
                 }
@@ -635,18 +629,10 @@ export const useCssTransition = (
                  */
                 revertAttr();
                 transitionCancelFn.current?.();
-
-                /**
-                 * 开始这一次的
-                 */
-                transitionStartFn.current?.();
-                isPending.current = true;
-                mainFn();
-            } else {
-                transitionStartFn.current?.();
-                isPending.current = true;
-                mainFn(true);
             }
+            transitionStartFn.current?.();
+            isPending.current = true;
+            mainFn();
         }
         return () => {
             mustRevertClass.remove && root.classList.add(mustRevertClass.remove);
