@@ -6,9 +6,6 @@ import { ConfigYML, PluginComms } from "@possie-engine/dr-plugin-sdk";
 import Header from "./header";
 import MainContent from "./main";
 import { ScrollComponent } from "./Components/Scroll";
-import VConsole from "vconsole";
-
-new VConsole();
 
 export const comms = new PluginComms({
     defaultConfig: new ConfigYML(),
