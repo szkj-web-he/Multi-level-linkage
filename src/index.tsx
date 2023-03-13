@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import "./font.scss";
 import "./style.scss";
 
-import { ConfigYML, PluginComms } from "@possie-engine/dr-plugin-sdk";
+import { ConfigYML, PluginComms } from "@datareachable/dr-plugin-sdk";
 import Header from "./header";
 import MainContent from "./main";
 import { ScrollComponent } from "./Components/Scroll";
@@ -16,7 +16,7 @@ export const comms = new PluginComms({
         options?: Array<{ code: string; content: string }>;
         data?: string;
     };
-    state: unknown;
+    state: Record<string, string | null>;
     renderOnReady: (res: React.ReactNode) => void;
 };
 
@@ -67,11 +67,19 @@ const Main: React.FC = () => {
     /* <------------------------------------ **** FUNCTION START **** ------------------------------------ */
     /************* This section will include this component general function *************/
 
+    const stateData: Record<string, string | null> = {};
+    for (const key in comms?.state) {
+        const keyVal = key.includes("#") ? key.split("#")[1] : undefined;
+
+        if (keyVal) {
+            stateData[keyVal] = comms?.state?.[key] ?? null;
+        }
+    }
     /* <------------------------------------ **** FUNCTION END **** ------------------------------------ */
     return (
         <ScrollComponent className="wrapper">
             <Header />
-            <MainContent list={data} />
+            <MainContent list={data} state={stateData} />
         </ScrollComponent>
     );
 };

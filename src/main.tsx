@@ -18,25 +18,34 @@ import { useEffect } from "react";
 
 interface TempProps {
     list: Array<DataProps>;
+    /**
+     * 回溯的答案
+     */
+    state: Record<string, string | null>;
 }
 
 /* <------------------------------------ **** INTERFACE END **** ------------------------------------ */
 /* <------------------------------------ **** FUNCTION COMPONENT START **** ------------------------------------ */
-const Temp: React.FC<TempProps> = ({ list }) => {
+const Temp: React.FC<TempProps> = ({ list, state }) => {
     /* <------------------------------------ **** STATE START **** ------------------------------------ */
     /************* This section will include this component HOOK function *************/
 
     /**
      * 非一级的menu
      */
-    const [menuData, setMenuData] = useState(() => initMenuData());
+    const [menuData, setMenuData] = useState(() => initMenuData(state));
 
-    const menuDataRef = useRef<typeof menuData>(initMenuData());
+    const menuDataRef = useRef<typeof menuData>(initMenuData(state));
 
-    const [selectData, setSelectData] = useState(() => initSelectData());
+    const [selectData, setSelectData] = useState(() => initSelectData(state));
 
-    const selectDataRef = useRef<typeof selectData>(initSelectData());
+    const selectDataRef = useRef<typeof selectData>(initSelectData(state));
     /* <------------------------------------ **** STATE END **** ------------------------------------ */
+
+    useEffect(() => {
+        setSelectData(initSelectData(state));
+        selectDataRef.current = initSelectData(state);
+    }, [state]);
 
     useEffect(() => {
         comms.state = selectData;
